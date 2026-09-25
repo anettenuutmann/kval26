@@ -23,6 +23,7 @@
 		    ).then(d => d.json()).then(kuva);
   }
   function kuva(kohad){
+	  console.log(kohad);
 	for(let koht of kohad){
 	  L.marker([koht[0], koht[1]]).addTo(kaart);
 	}
