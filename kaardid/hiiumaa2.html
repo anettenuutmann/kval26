@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Hiiumaa kohad</title>
+    <script>
+      function loe(){
+        fetch("https://script.google.com/macros/s/AKfycbyAlaAG7HOArKZOWrLtWb6ROZrupBHx-1NzVN_k1mms84KETokWeCytyYiyuHnezs9l/exec")
+          .then(d => d.json())
+          .then(kuva);
+      }
+
+      function kuva(andmed){
+        console.log(andmed);
+
+        for(let i = 0; i < andmed.length; i++){
+          let rida = tabel.insertRow();
+
+          rida.insertCell().innerText = andmed[i][2]; // koha nimi
+          rida.insertCell().innerText = andmed[i][3]; // kirjeldus
+          rida.insertCell().innerText = andmed[i][0]; // laiuskraad
+          rida.insertCell().innerText = andmed[i][1]; // pikkuskraad
+        }
+      }
+    </script>
+  </head>
+
+  <body onload="loe()">
+    <h1>Hiiumaa kohad</h1>
+
+    <table id="tabel" border="1" cellpadding="8">
+      <tr>
+        <th>Koht</th>
+        <th>Liik</th>
+        <th>Laiuskraad</th>
+        <th>Pikkuskraad</th>
+      </tr>
+    </table>
+  </body>
+</html>
