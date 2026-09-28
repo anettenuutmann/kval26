@@ -25,20 +25,83 @@
           }
         ).addTo(kaart);
 
+        // Kärdla ja Käina: punased ringid
         L.marker([59.001257, 22.744203]).addTo(kaart)
           .bindPopup("Kärdla – maja");
-
-        L.marker([58.79338, 22.835255]).addTo(kaart)
-          .bindPopup("Kassari – rand");
+        L.circle([59.001257, 22.744203], {
+          color: "red",
+          fillOpacity: 0,
+          radius: 1000
+        }).addTo(kaart);
 
         L.marker([58.831337, 22.779808]).addTo(kaart)
           .bindPopup("Käina – pood");
+        L.circle([58.831337, 22.779808], {
+          color: "red",
+          fillOpacity: 0,
+          radius: 1000
+        }).addTo(kaart);
 
+        // Tuletornid: kollased ringid
         L.marker([58.916111, 22.198610]).addTo(kaart)
           .bindPopup("Kõpu tuletorn");
+        L.circle([58.916111, 22.198610], {
+          color: "yellow",
+          fillOpacity: 0,
+          radius: 1000
+        }).addTo(kaart);
+
+        L.marker([58.940033, 22.055217]).addTo(kaart)
+          .bindPopup("Ristna tuletorn");
+        L.circle([58.940033, 22.055217], {
+          color: "yellow",
+          fillOpacity: 0,
+          radius: 1000
+        }).addTo(kaart);
+
+        L.marker([59.0914, 22.586183]).addTo(kaart)
+          .bindPopup("Tahkuna tuletorn");
+        L.circle([59.0914, 22.586183], {
+          color: "yellow",
+          fillOpacity: 0,
+          radius: 1000
+        }).addTo(kaart);
+
+        // Sadamad: sinised ringid
+        L.marker([58.86667, 23.04833]).addTo(kaart)
+          .bindPopup("Heltermaa sadam");
+        L.circle([58.86667, 23.04833], {
+          color: "blue",
+          fillOpacity: 0,
+          radius: 1000
+        }).addTo(kaart);
+
+        L.marker([58.69069, 22.52147]).addTo(kaart)
+          .bindPopup("Sõru sadam");
+        L.circle([58.69069, 22.52147], {
+          color: "blue",
+          fillOpacity: 0,
+          radius: 1000
+        }).addTo(kaart);
+
+        // Ülejäänud Hiiumaa kohad
+        L.marker([58.79338, 22.835255]).addTo(kaart)
+          .bindPopup("Kassari – rand");
 
         L.marker([58.770052, 22.815455]).addTo(kaart)
           .bindPopup("Sääretirp");
+
+        L.marker([58.836461, 23.056704]).addTo(kaart)
+          .bindPopup("Sarve");
+
+        L.marker([58.92028, 22.07667]).addTo(kaart)
+          .bindPopup("Kalana");
+
+        L.marker([58.981657, 22.467808]).addTo(kaart)
+          .bindPopup("Kõrgessaare");
+
+        L.marker([58.7061, 22.5894]).addTo(kaart)
+          .bindPopup("Emmaste");
       }
     </script>
   </head>
