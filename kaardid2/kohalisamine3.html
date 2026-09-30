@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+ <head>
+ <title>Kaart</title>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/leaflet.js"></script>
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/leaflet.css" />
+ <style>
+   body {padding: 0; margin: 0; }
+   html, body { height: 100%; width: 100%;}
+   #kaardikiht {float:bottom; width:100%; height:80%;}
+ </style>
+ <script>
+   var kaart;
+   var hypik;
+   function algus(){
+    kaart = L.map('kaardikiht').setView([59.439, 24.773], 12);
+      new L.TileLayer(  'https://tiles.maaamet.ee/tm/tms/1.0.0/hybriid@GMC/{z}/{x}/{y}.png&ASUTUS=TLU&ERIALA=DIGIHUMANITAARIA', {
+	  attribution: "Map: <a  href='http://www.maaamet.ee/'>Maa-amet</a>",
+	  tms: true,
+    }).addTo(kaart);
+
+   	hypik=L.popup(); 
+	kaart.on("click", vajutus);
+   }
+   function vajutus(e){
+	     hypik.setLatLng(e.latlng).
+		 setContent("Vajutasid "+e.latlng.toString()).openOn(kaart);
+	     let lisand="laiuskraad="+e.latlng.lat+"&pikkuskraad="+e.latlng.lng+"&tyyp="+tyybivalik.value+"&kommentaar="+encodeURI(kast1.value);
+	     console.log(lisand);
+	     fetch("https://script.google.com/macros/s/AKfycbzeDQHGoo9wkXtaa49FS8F9VlWuzDBaV_JFYKbpjOgzbwKulHLeYAdaZimYwkPHOSLBdw/exec?"+lisand)
+	   //https://script.google.com/macros/s/AKfycbyxanIant5rJ88p462pK3RzAG6Wn56l8gQBz4LY5A4yJl80SBnMv15adGPD-2Pq4mjH/exec?laiuskraad=58.5&pikkuskraad=22.1&tyyp=katlamaja&kommentaar=punane
+   }
+
+  </script>
+ </head>  
+ <body onload="algus()">
+  <div>
+	  <select id="tyybivalik">
+		  <option>kool</option>
+		  <option>kirik</option>
+		  <option>kauplus</option>
+	  </select>
+	  <input type="text" id="kast1" />
+  </div>
+  <div id="kaardikiht"></div>
+ </body>
+</html>
