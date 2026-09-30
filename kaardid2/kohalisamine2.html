@@ -25,9 +25,11 @@
    function vajutus(e){
 	     hypik.setLatLng(e.latlng).
 		 setContent("Vajutasid "+e.latlng.toString()).openOn(kaart);
-	     let lisand="laiuskraad="+e.latlng.lat+"&pikkuskraad="+e.latlng.lng+"&tyyp="+tyybivalik.value;
+	     let lisand="laiuskraad="+e.latlng.lat+"&pikkuskraad="+e.latlng.lng+"&tyyp="+tyybivalik.value+"&kommentaar="+encodeURI(kast1.value);
 	     console.log(lisand);
 	     fetch("https://script.google.com/macros/s/AKfycbx9Qg6QIxRmhdYk6OXgGnNXhSf40ei2oxrhS4DTErEYCSX363k9bfZ4e3bSMP4D8sEPQw/exec?"+lisand)
+	   //https://script.google.com/macros/s/AKfycbxf8hGQZai-K2UqyY3sMqW8BNglbxrFRmE1B5S2U22T1JXKlX2XBJnw2ur3wZmb2_gYRA/exec?laiuskraad=58.5&pikkuskraad=22.1&tyyp=katlamaja&kommentaar=punane
+
    }
 
   </script>
@@ -39,6 +41,7 @@
 		  <option>kirik</option>
 		  <option>kauplus</option>
 	  </select>
+	  <input type= "text" id="kast1" />
   </div>
   <div id="kaardikiht"></div>
  </body>
