@@ -1,91 +1,96 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Hiiumaa kaart</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/leaflet.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/leaflet.css" />
+ <head>
+ <meta charset="utf-8" />
+ <title>Hiiumaa kaart</title>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/leaflet.js"></script>
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/leaflet.css" />
+ <style>
+   body {padding: 0; margin: 0;}
+   html, body {height: 100%; width: 100%;}
+   #kaardikiht {width: 100%; height: 80%;}
+ </style>
+ <script>
+   let kaart;
+   let hypik;
+   let marker1;
+   let grupp;
+   let kohad=[];
+   let aadress="https://script.google.com/macros/s/AKfycbwTZWUCvoDEbHj0QGU4c1vL5Sk20HzcqUTxf8d6r0wHdIERk9GMCaz780a52yulWqQS/exec";
 
-    <script>
-      let kaart, hypik, grupp;
-      let koht;
-      let kohad = [];
+   function algus(){
+     kaart=L.map('kaardikiht').setView([58.9, 22.6], 10);
+     new L.TileLayer(
+       'https://tiles.maaamet.ee/tm/tms/1.0.0/hybriid@GMC/{z}/{x}/{y}.png&ASUTUS=TLU&ERIALA=DIGIHUMANITAARIA', {
+         attribution: "Map: <a href='http://www.maaamet.ee/'>Maa-amet</a>",
+         tms: true
+       }).addTo(kaart);
 
-      let aadress = "https://script.google.com/macros/s/AKfycbwTZWUCvoDEbHj0QGU4c1vL5Sk20HzcqUTxf8d6r0wHdIERk9GMCaz780a52yulWqQS/exec";
+     marker1=L.marker([58.9, 22.6], {draggable: true});
+     marker1.addTo(kaart);
+     marker1.on("dragend", liikumine);
 
-      function algus(){
-        kaart = L.map('kaardikiht').setView([58.9, 22.6], 10);
+     grupp=L.layerGroup();
+     grupp.addTo(kaart);
 
-        new L.TileLayer(
-          'https://tiles.maaamet.ee/tm/tms/1.0.0/hybriid@GMC/{z}/{x}/{y}.png&ASUTUS=TLU&ERIALA=DIGIHUMANITAARIA', {
-            attribution: "Maa-amet",
-            tms: true
-          }
-        ).addTo(kaart);
+     hypik=L.popup();
+     kaart.on("click", vajutus);
+     loe();
+   }
 
-        hypik = L.popup();
-        grupp = L.layerGroup().addTo(kaart);
-        kaart.on("click", vajutus);
-        fetch(aadress).then(d => d.json()).then(kuva);
-      }
+   function loe(){
+     fetch(aadress).then(d => d.json()).then(kuva);
+   }
 
-      function kuva(andmed){
-        kohad = andmed;
-        grupp.clearLayers();
+   function kuva(andmed){
+     kohad=andmed;
+     grupp.clearLayers();
 
-        for(let i = 0; i < kohad.length; i++){
-          L.marker([kohad[i][0], kohad[i][1]])
-            .addTo(grupp)
-            .bindPopup(kohad[i][2] + " " + kohad[i][3]);
-        }
+     for(let i=0; i<kohad.length; i++){
+       L.marker([kohad[i][0], kohad[i][1]])
+         .addTo(grupp)
+         .bindPopup(kohad[i][2]+" "+kohad[i][3]);
+     }
 
-        if(koht){
-          kaugused();
-        }
-      }
+     liikumine();
+   }
 
-      function vajutus(e){
-        koht = e.latlng;
-        hypik.setLatLng(koht)
-          .setContent("Vajutasid " + koht.toString())
-          .openOn(kaart);
-        kaugused();
-      }
+   function liikumine(){
+     selgitus.innerText="";
+     let koht1=marker1.getLatLng();
 
-      function kaugused(){
-        selgitus.innerText = "";
+     for(let i=0; i<kohad.length; i++){
+       let koht2=L.latLng(kohad[i][0], kohad[i][1]);
+       let kaugus=Math.round(koht1.distanceTo(koht2))/1000;
+       selgitus.innerText+=kohad[i][2]+": "+kaugus+" km\n";
+     }
+   }
 
-        for(let i = 0; i < kohad.length; i++){
-          let teinekoht = L.latLng(kohad[i][0], kohad[i][1]);
-          let kaugus = koht.distanceTo(teinekoht) / 1000;
+   function vajutus(e){
+     marker1.setLatLng(e.latlng);
+     hypik.setLatLng(e.latlng)
+       .setContent("Vajutasid "+e.latlng.toString()).openOn(kaart);
+     liikumine();
+   }
 
-          selgitus.innerText += kohad[i][2] + ": " +
-            kaugus.toFixed(2) + " km\n";
-        }
-      }
+   function salvesta(){
+     let koht1=marker1.getLatLng();
+     let lisand="?laiuskraad="+koht1.lat+
+       "&pikkuskraad="+koht1.lng+
+       "&tyyp="+encodeURIComponent(tyyp.value)+
+       "&kommentaar="+encodeURIComponent(kast.value);
 
-      function salvesta(){
-        if(koht){
-          let lisand = "?laiuskraad=" + koht.lat +
-            "&pikkuskraad=" + koht.lng +
-            "&tyyp=" + encodeURIComponent(tyyp.value) +
-            "&kommentaar=" + encodeURIComponent(kast.value);
-
-          fetch(aadress + lisand)
-            .then(d => d.json()).then(kuva);
-        }
-      }
-    </script>
-  </head>
-
-  <body onload="algus()">
-    Koha nimi: <input id="tyyp" />
-    Kirjeldus: <input id="kast" />
-    <input type="button" value="Salvesta" onclick="salvesta()" />
-
-    <p>Vali koht kaardile klõpsates.</p>
-    <div id="kaardikiht" style="height: 500px;"></div>
-    <p>Kaugused linnulennult:</p>
-    <div id="selgitus"></div>
-  </body>
+     fetch(aadress+lisand).then(d => d.json()).then(kuva);
+   }
+ </script>
+ </head>
+ <body onload="algus()">
+   Koha nimi: <input id="tyyp" />
+   Kirjeldus: <input id="kast" />
+   <input type="button" value="Salvesta" onclick="salvesta()" />
+   <input type="button" value="Uuenda" onclick="loe()" />
+   <div id="kaardikiht"></div>
+   <p>Kaugused linnulennult:</p>
+   <div id="selgitus">selgituse koht</div>
+ </body>
 </html>
