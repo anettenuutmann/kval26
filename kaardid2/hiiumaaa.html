@@ -2,22 +2,15 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Hiiumaa kohad ja kaugused</title>
-
+    <title>Hiiumaa kaart</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/leaflet.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/leaflet.css" />
 
-    <style>
-      body { margin: 0; }
-      #kaardikiht { width: 100%; height: 500px; }
-      #juhtimine { padding: 10px; }
-    </style>
-
     <script>
       let kaart;
+      let hypik;
       let grupp;
       let valitudkoht;
-      let valitudmarker;
       let kohad = [];
 
       let aadress = "https://script.google.com/macros/s/AKfycbwTZWUCvoDEbHj0QGU4c1vL5Sk20HzcqUTxf8d6r0wHdIERk9GMCaz780a52yulWqQS/exec";
@@ -27,24 +20,19 @@
 
         new L.TileLayer(
           'https://tiles.maaamet.ee/tm/tms/1.0.0/hybriid@GMC/{z}/{x}/{y}.png&ASUTUS=TLU&ERIALA=DIGIHUMANITAARIA', {
-            attribution: "Map: <a href='https://www.maaamet.ee/'>Maa-amet</a>",
+            attribution: "Maa-amet",
             tms: true
           }
         ).addTo(kaart);
 
         grupp = L.layerGroup().addTo(kaart);
+        hypik = L.popup();
         kaart.on("click", vajutus);
         loe();
       }
 
       function loe(){
-        fetch(aadress)
-          .then(d => d.json())
-          .then(kuva)
-          .catch(viga => {
-            teade.innerText = "Andmete lugemine ebaõnnestus.";
-            console.log(viga);
-          });
+        fetch(aadress).then(d => d.json()).then(kuva);
       }
 
       function kuva(andmed){
@@ -52,12 +40,9 @@
         grupp.clearLayers();
 
         for(let i = 0; i < kohad.length; i++){
-          let tekst = document.createElement("span");
-          tekst.innerText = kohad[i][2] + " – " + kohad[i][3];
-
           L.marker([kohad[i][0], kohad[i][1]])
             .addTo(grupp)
-            .bindPopup(tekst);
+            .bindPopup(kohad[i][2] + " – " + kohad[i][3]);
         }
 
         if(valitudkoht){
@@ -68,17 +53,9 @@
       function vajutus(e){
         valitudkoht = e.latlng;
 
-        if(valitudmarker){
-          valitudmarker.setLatLng(valitudkoht);
-        } else {
-          valitudmarker = L.circleMarker(valitudkoht, {
-            color: "red"
-          }).addTo(kaart);
-        }
-
-        asukoht.innerText =
-          "Valitud koht: " + valitudkoht.lat.toFixed(5) +
-          ", " + valitudkoht.lng.toFixed(5);
+        hypik.setLatLng(valitudkoht)
+          .setContent("Valitud koht")
+          .openOn(kaart);
 
         kaugused();
       }
@@ -90,7 +67,7 @@
           let koht = L.latLng(kohad[i][0], kohad[i][1]);
           let kaugus = valitudkoht.distanceTo(koht) / 1000;
 
-          tekst += kohad[i][2] + " – " +
+          tekst += kohad[i][2] + ": " +
             kaugus.toFixed(2) + " km\n";
         }
 
@@ -98,67 +75,28 @@
       }
 
       function salvesta(){
-        if(!valitudkoht){
-          teade.innerText = "Vali kõigepealt kaardil koht.";
-          return;
+        if(valitudkoht){
+          let lisand = "?laiuskraad=" + valitudkoht.lat +
+            "&pikkuskraad=" + valitudkoht.lng +
+            "&tyyp=" + encodeURIComponent(tyyp.value) +
+            "&kommentaar=" + encodeURIComponent(kommentaar.value);
+
+          fetch(aadress + lisand).then(d => d.json()).then(kuva);
         }
-
-        if(!tyyp.value.trim()){
-          teade.innerText = "Sisesta koha nimi.";
-          return;
-        }
-
-        let lisand =
-          "?laiuskraad=" + valitudkoht.lat +
-          "&pikkuskraad=" + valitudkoht.lng +
-          "&tyyp=" + encodeURIComponent(tyyp.value) +
-          "&kommentaar=" + encodeURIComponent(kommentaar.value);
-
-        salvestusnupp.disabled = true;
-        teade.innerText = "Salvestan...";
-
-        fetch(aadress + lisand)
-          .then(d => d.json())
-          .then(andmed => {
-            kuva(andmed);
-            teade.innerText = "Koht salvestatud! Kontrolli ka tabelit.";
-            salvestusnupp.disabled = false;
-          })
-          .catch(viga => {
-            teade.innerText =
-              "Salvestamise kinnitust ei saadud. Kontrolli tabelit.";
-            salvestusnupp.disabled = false;
-            console.log(viga);
-          });
       }
     </script>
   </head>
 
   <body onload="algus()">
-    <div id="juhtimine">
-      <h1>Hiiumaa kohad ja kaugused</h1>
-      <p>Klõpsa kaardil, et valida asukoht ja näha kaugusi.</p>
+    Koha nimi: <input type="text" id="tyyp" />
+    Kirjeldus: <input type="text" id="kommentaar" />
+    <input type="button" value="Salvesta" onclick="salvesta()" />
+    <input type="button" value="Uuenda" onclick="loe()" />
 
-      Koha nimi:
-      <input type="text" id="tyyp" />
+    <p>Klõpsa kaardil, et valida koht.</p>
+    <div id="kaardikiht" style="height: 500px;"></div>
 
-      Kirjeldus:
-      <input type="text" id="kommentaar" />
-
-      <input type="button" id="salvestusnupp"
-        value="Salvesta koht" onclick="salvesta()" />
-
-      <input type="button" value="Uuenda andmeid" onclick="loe()" />
-
-      <p id="asukoht">Asukoht veel valimata.</p>
-      <p id="teade"></p>
-    </div>
-
-    <div id="kaardikiht"></div>
-
-    <div id="juhtimine">
-      <h2>Kaugused linnulennult</h2>
-      <div id="vastus">Kauguste nägemiseks vali kaardil koht.</div>
-    </div>
+    <p>Kaugused linnulennult:</p>
+    <div id="vastus"></div>
   </body>
 </html>
