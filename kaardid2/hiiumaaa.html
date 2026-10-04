@@ -2,19 +2,20 @@
 <html>
  <head>
  <meta charset="utf-8" />
- <title>Hiiumaa kaart</title>
+ <title>Kaart</title>
  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/leaflet.js"></script>
  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/leaflet.css" />
  <style>
    body {padding: 0; margin: 0;}
    html, body {height: 100%; width: 100%;}
-   #kaardikiht {width: 100%; height: 80%;}
+   #kaardikiht {width: 100%; height: 100%;}
  </style>
  <script>
    let kaart;
    let hypik;
    let marker1;
    let grupp;
+   let markerigrupp;
    let kohad=[];
    let aadress="https://script.google.com/macros/s/AKfycbwTZWUCvoDEbHj0QGU4c1vL5Sk20HzcqUTxf8d6r0wHdIERk9GMCaz780a52yulWqQS/exec";
 
@@ -32,6 +33,8 @@
 
      grupp=L.layerGroup();
      grupp.addTo(kaart);
+     markerigrupp=L.layerGroup();
+     markerigrupp.addTo(kaart);
 
      hypik=L.popup();
      kaart.on("click", vajutus);
@@ -44,11 +47,11 @@
 
    function kuva(andmed){
      kohad=andmed;
-     grupp.clearLayers();
+     markerigrupp.clearLayers();
 
      for(let i=0; i<kohad.length; i++){
        L.marker([kohad[i][0], kohad[i][1]])
-         .addTo(grupp)
+         .addTo(markerigrupp)
          .bindPopup(kohad[i][2]+" "+kohad[i][3]);
      }
 
@@ -57,19 +60,21 @@
 
    function liikumine(){
      selgitus.innerText="";
+     grupp.clearLayers();
      let koht1=marker1.getLatLng();
 
      for(let i=0; i<kohad.length; i++){
        let koht2=L.latLng(kohad[i][0], kohad[i][1]);
-       let kaugus=Math.round(koht1.distanceTo(koht2))/1000;
-       selgitus.innerText+=kohad[i][2]+": "+kaugus+" km\n";
+       selgitus.innerText+=kohad[i][2]+": "+
+         Math.round(koht1.distanceTo(koht2))/1000+" km\n";
+       L.polyline([koht1, koht2]).addTo(grupp);
      }
    }
 
    function vajutus(e){
-     marker1.setLatLng(e.latlng);
      hypik.setLatLng(e.latlng)
        .setContent("Vajutasid "+e.latlng.toString()).openOn(kaart);
+     marker1.setLatLng(e.latlng);
      liikumine();
    }
 
@@ -89,8 +94,7 @@
    Kirjeldus: <input id="kast" />
    <input type="button" value="Salvesta" onclick="salvesta()" />
    <input type="button" value="Uuenda" onclick="loe()" />
-   <div id="kaardikiht"></div>
-   <p>Kaugused linnulennult:</p>
    <div id="selgitus">selgituse koht</div>
+   <div id="kaardikiht"></div>
  </body>
 </html>
