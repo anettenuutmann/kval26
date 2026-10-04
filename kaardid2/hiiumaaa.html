@@ -2,13 +2,13 @@
 <html>
  <head>
  <meta charset="utf-8" />
- <title>Kaart</title>
+ <title>Hiiumaa kaart</title>
  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/leaflet.js"></script>
  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/leaflet.css" />
  <style>
    body {padding: 0; margin: 0;}
    html, body {height: 100%; width: 100%;}
-   #kaardikiht {width: 100%; height: 100%;}
+   #kaardikiht {width: 100%; height: 80%;}
  </style>
  <script>
    let kaart;
@@ -38,10 +38,6 @@
 
      hypik=L.popup();
      kaart.on("click", vajutus);
-     loe();
-   }
-
-   function loe(){
      fetch(aadress).then(d => d.json()).then(kuva);
    }
 
@@ -74,14 +70,12 @@
    function vajutus(e){
      hypik.setLatLng(e.latlng)
        .setContent("Vajutasid "+e.latlng.toString()).openOn(kaart);
+
      marker1.setLatLng(e.latlng);
      liikumine();
-   }
 
-   function salvesta(){
-     let koht1=marker1.getLatLng();
-     let lisand="?laiuskraad="+koht1.lat+
-       "&pikkuskraad="+koht1.lng+
+     let lisand="?laiuskraad="+e.latlng.lat+
+       "&pikkuskraad="+e.latlng.lng+
        "&tyyp="+encodeURIComponent(tyyp.value)+
        "&kommentaar="+encodeURIComponent(kast.value);
 
@@ -92,9 +86,9 @@
  <body onload="algus()">
    Koha nimi: <input id="tyyp" />
    Kirjeldus: <input id="kast" />
-   <input type="button" value="Salvesta" onclick="salvesta()" />
-   <input type="button" value="Uuenda" onclick="loe()" />
-   <div id="selgitus">selgituse koht</div>
+   <p>Kirjuta nimi ja kirjeldus ning klõpsa kaardil, et koht salvestada.
+   Kauguste uurimiseks lohista markerit.</p>
    <div id="kaardikiht"></div>
+   <div id="selgitus">selgituse koht</div>
  </body>
 </html>
