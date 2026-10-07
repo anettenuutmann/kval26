@@ -11,6 +11,7 @@
    #kaardikiht {width: 100%; height: 80%;}
  </style>
  <script>
+  //kaardi ja kohtade jaoks
    let kaart;
    let hypik;
    let marker1;
@@ -19,6 +20,7 @@
    let kohad=[];
    let aadress="https://script.google.com/macros/s/AKfycbwTZWUCvoDEbHj0QGU4c1vL5Sk20HzcqUTxf8d6r0wHdIERk9GMCaz780a52yulWqQS/exec";
 
+  // loob kaardi 
    function algus(){
      kaart=L.map('kaardikiht').setView([58.9, 22.6], 10);
      new L.TileLayer(
@@ -26,7 +28,7 @@
          attribution: "Map: <a href='http://www.maaamet.ee/'>Maa-amet</a>",
          tms: true
        }).addTo(kaart);
-
+//loob markeri
      marker1=L.marker([58.9, 22.6], {draggable: true});
      marker1.addTo(kaart);
      marker1.on("dragend", liikumine);
@@ -35,12 +37,12 @@
      grupp.addTo(kaart);
      markerigrupp=L.layerGroup();
      markerigrupp.addTo(kaart);
-
+//vajutus, tabelist andmed
      hypik=L.popup();
      kaart.on("click", vajutus);
      fetch(aadress).then(d => d.json()).then(kuva);
    }
-
+//// Kuvab tabeli kohad kaardil
    function kuva(andmed){
      kohad=andmed;
      markerigrupp.clearLayers();
@@ -53,7 +55,7 @@
 
      liikumine();
    }
-
+//Arvutab kaugused kõigi kohtadeni ja joonistab jooned
    function liikumine(){
      selgitus.innerText="";
      grupp.clearLayers();
@@ -66,14 +68,14 @@
        L.polyline([koht1, koht2]).addTo(grupp);
      }
    }
-
+// Liigutab markeri klõpsatud kohta ja näitab koordinaate
    function vajutus(e){
      hypik.setLatLng(e.latlng)
        .setContent("Vajutasid "+e.latlng.toString()).openOn(kaart);
 
      marker1.setLatLng(e.latlng);
      liikumine();
-
+// Paneb kokku tabelisse saadetavad andmed
      let lisand="?laiuskraad="+e.latlng.lat+
        "&pikkuskraad="+e.latlng.lng+
        "&tyyp="+encodeURIComponent(tyyp.value)+
