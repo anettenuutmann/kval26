@@ -2,34 +2,15 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Naised ja nende sünnikohad</title>
+    <title>Naised ametite järgi</title>
     <script>
       function kysi(){
-        let tingimus = `?isik wdt:P106 wd:${amet.value}.`;
-        let asukoht = "?synnikoht wdt:P131* wd:Q21.";
-
-        // Ameerika Ühendriikides asuv sünnikoht
-        if (riik.value == "Q30"){
-          asukoht = "?synnikoht wdt:P17 wd:Q30.";
-        }
-
-        // Peaminister on ametikoht
-        if (amet.value == "Q14211"){
-          tingimus = "?isik wdt:P39 wd:Q14211.";
-        }
-
-        // Printsess on tiitel
-        if (amet.value == "Q863048"){
-          tingimus = "?isik wdt:P97/wdt:P279* wd:Q863048.";
-        }
-
         let lause = `
-          SELECT DISTINCT ?isik ?isikLabel ?synnikohtLabel
+          SELECT DISTINCT ?isik ?isikLabel
           WHERE {
-            ${tingimus}
+            ?isik wdt:P27 wd:${riik.value}.
+            ?isik wdt:P106 wd:${amet.value}.
             ?isik wdt:P21 wd:Q6581072.
-            ?isik wdt:P19 ?synnikoht.
-            ${asukoht}
 
             SERVICE wikibase:label {
               bd:serviceParam wikibase:language "et,en,mul".
@@ -42,15 +23,7 @@
           + encodeURIComponent(lause);
 
         vastus.innerHTML = "ootan vastust";
-
-        fetch(aadress)
-          .then(d => {
-            if (!d.ok){
-              throw new Error("Päring ebaõnnestus");
-            }
-            return d.json();
-          })
-          .then(kuva)
+        fetch(aadress).then(d => d.json()).then(kuva)
           .catch(() => {
             vastus.innerHTML = "Päring ebaõnnestus. Proovi uuesti.";
           });
@@ -62,8 +35,7 @@
 
         for (let rida of d["results"]["bindings"]){
           let lause = document.createElement("li");
-          lause.textContent = rida["isikLabel"]["value"]
-            + " – " + rida["synnikohtLabel"]["value"];
+          lause.textContent = rida["isikLabel"]["value"];
           vastus.appendChild(lause);
         }
 
@@ -74,20 +46,19 @@
     </script>
   </head>
   <body>
-    <h1>Naised ja nende sünnikohad</h1>
-    <p>Vali sünniriik ja kategooria.</p>
+    <h1>Naised ametite järgi</h1>
 
     <select id="riik" onchange="kysi()">
-      <option value="Q21">Inglismaa</option>
-      <option value="Q30">Ameerika Ühendriigid</option>
+      <option value="Q145">Briti</option>
+      <option value="Q30">Ameerika Ühendriikide</option>
     </select>
 
     <select id="amet" onchange="kysi()">
       <option value="Q36180">kirjanikud</option>
       <option value="Q483501">kunstnikud</option>
+      <option value="Q201788">ajaloolased</option>
+      <option value="Q82955">poliitikud</option>
       <option value="Q116">monarhid</option>
-      <option value="Q863048">printsessid</option>
-      <option value="Q14211">Ühendkuningriigi peaministrid</option>
     </select>
 
     <input type="button" value="otsi" onclick="kysi()" />
