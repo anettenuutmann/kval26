@@ -1,0 +1,74 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Inglismaal sündinud naised</title>
+    <script>
+      function kysi(){
+        // Valime ameti, ametikoha või tiitli
+        let tingimus = `?isik wdt:P106/wdt:P279* wd:${amet.value}.`;
+
+        if (amet.value == "Q14211"){
+          tingimus = "?isik wdt:P39 wd:Q14211.";
+        }
+
+        if (amet.value == "Q863048"){
+          tingimus = "?isik wdt:P97/wdt:P279* wd:Q863048.";
+        }
+
+        let lause = `
+          SELECT DISTINCT ?isik ?isikLabel ?synnikohtLabel
+          WHERE {
+            ${tingimus}
+            ?isik wdt:P21 wd:Q6581072.
+            ?isik wdt:P19 ?synnikoht.
+            ?synnikoht wdt:P131* wd:Q21.
+
+            SERVICE wikibase:label {
+              bd:serviceParam wikibase:language "et,en,mul".
+            }
+          }
+          LIMIT 40
+        `;
+
+        let aadress = "https://query.wikidata.org/sparql?format=json&query="
+          + encodeURIComponent(lause);
+
+        vastus.innerHTML = "ootan vastust";
+        fetch(aadress).then(d => d.json()).then(kuva);
+      }
+
+      function kuva(d){
+        console.log(d);
+        vastus.innerHTML = "";
+
+        for (let rida of d["results"]["bindings"]){
+          let lause = document.createElement("li");
+          lause.textContent = rida["isikLabel"]["value"]
+            + " – " + rida["synnikohtLabel"]["value"];
+          vastus.appendChild(lause);
+        }
+
+        if (d["results"]["bindings"].length == 0){
+          vastus.innerHTML = "Tulemusi ei leitud.";
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Inglismaal sündinud naised</h1>
+    <p>Vali kategooria, et näha naiste nimesid ja sünnikohti.</p>
+
+    <select id="amet" onchange="kysi()">
+      <option value="Q36180">kirjanikud</option>
+      <option value="Q483501">kunstnikud</option>
+      <option value="Q116">monarhid</option>
+      <option value="Q863048">printsessid</option>
+      <option value="Q14211">Ühendkuningriigi peaministrid</option>
+    </select>
+
+    <input type="button" value="otsi" onclick="kysi()" />
+
+    <ul id="vastus"></ul>
+  </body>
+</html>
