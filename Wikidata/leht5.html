@@ -8,7 +8,8 @@
         let lause = `
           SELECT DISTINCT ?isik ?isikLabel
           WHERE {
-            ?isik wdt:P27 wd:${riik.value}.
+            VALUES ?riik { ${riik.value} }
+            ?isik wdt:P27 ?riik.
             ?isik wdt:P106 wd:${amet.value}.
             ?isik wdt:P21 wd:Q6581072.
 
@@ -23,10 +24,7 @@
           + encodeURIComponent(lause);
 
         vastus.innerHTML = "ootan vastust";
-        fetch(aadress).then(d => d.json()).then(kuva)
-          .catch(() => {
-            vastus.innerHTML = "Päring ebaõnnestus. Proovi uuesti.";
-          });
+        fetch(aadress).then(d => d.json()).then(kuva);
       }
 
       function kuva(d){
@@ -38,10 +36,6 @@
           lause.textContent = rida["isikLabel"]["value"];
           vastus.appendChild(lause);
         }
-
-        if (d["results"]["bindings"].length == 0){
-          vastus.innerHTML = "Tulemusi ei leitud.";
-        }
       }
     </script>
   </head>
@@ -49,8 +43,10 @@
     <h1>Naised ametite järgi</h1>
 
     <select id="riik" onchange="kysi()">
-      <option value="Q145">Briti</option>
-      <option value="Q30">Ameerika Ühendriikide</option>
+      <option value="wd:Q145 wd:Q179876 wd:Q161885 wd:Q215530">
+        Briti
+      </option>
+      <option value="wd:Q30">Ameerika Ühendriikide</option>
     </select>
 
     <select id="amet" onchange="kysi()">
