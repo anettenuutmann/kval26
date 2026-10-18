@@ -1,63 +1,108 @@
 <!doctype html>
 <html lang="et">
-  <head>
-    <meta charset="utf-8">
-    <title>Henry VIII perekond</title>
-  </head>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Henry VIII perekond</title>
 
-  <body>
-    <h1>Henry VIII perekond</h1>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 25px;
+    }
 
-    <h2>Perekonnavõrgustik</h2>
-    <p>Võrgustik näitab lapse ja vanema vahelisi seoseid.</p>
-    <iframe id="vorgustik" title="Perekonnavõrgustik"
-      width="100%" height="650" style="border:0"></iframe>
+    iframe {
+      display: block;
+      width: 100%;
+      height: 650px;
+      border: 1px solid #cccccc;
+      margin-top: 15px;
+      margin-bottom: 35px;
+    }
+  </style>
+</head>
 
-    <h2>Henry VIII ja tema esivanemate ajajoon</h2>
-    <p>Ajajoon näitab Henry VIII, tema vanemate ja vanavanemate eluiga.</p>
-    <iframe id="ajajoon" title="Esivanemate ajajoon"
-      width="100%" height="550" style="border:0"></iframe>
+<body>
+  <h1>Henry VIII perekond</h1>
 
-    <script>
-      let graaf = `
-        #defaultView:Graph
-        SELECT DISTINCT ?laps ?lapsLabel ?vanem ?vanemLabel WHERE {
-          {
-            ?laps (wdt:P22|wdt:P25)* wd:Q38370.
-            ?laps (wdt:P22|wdt:P25) ?vanem.
-          }
-          UNION
-          {
-            wd:Q38370 (wdt:P22|wdt:P25) ?laps.
-            ?laps (wdt:P22|wdt:P25) ?vanem.
-          }
+  <h2>Perekonnavõrgustik</h2>
+  <p>
+    Võrgustik näitab Henry VIII vanemaid, vanavanemaid
+    ja järglasi ning nende vanemaid.
+    Seosed on suunaga lapselt vanemale.
+  </p>
 
-          SERVICE wikibase:label {
-            bd:serviceParam wikibase:language "et,en".
-          }
-        }
-      `;
+  <a id="graafilink" target="_blank" rel="noopener">
+    Ava võrgustik Wikidatas
+  </a>
 
-      let aeg = `
-        #defaultView:Timeline
-        SELECT ?isik ?isikLabel ?synd ?surm WHERE {
-          wd:Q38370 (wdt:P22|wdt:P25)?/(wdt:P22|wdt:P25)? ?isik.
-          ?isik wdt:P569 ?synd.
-          ?isik wdt:P570 ?surm.
+  <iframe
+    id="vorgustik"
+    title="Henry VIII perekonnavõrgustik">
+  </iframe>
 
-          SERVICE wikibase:label {
-            bd:serviceParam wikibase:language "et,en".
-          }
-        }
-        ORDER BY ?synd
-      `;
+  <h2>Henry VIII ja tema esivanemate ajajoon</h2>
+  <p>
+    Ajajoon näitab Henry VIII ning tema vanemate
+    ja vanavanemate sünni- ja surmakuupäevi.
+  </p>
 
-      // Lisame päringud Wikidata manustamislinkidesse.
-      document.getElementById("vorgustik").src =
-        "https://query.wikidata.org/embed.html#" + encodeURIComponent(graaf);
+  <a id="ajalink" target="_blank" rel="noopener">
+    Ava ajajoon Wikidatas
+  </a>
 
-      document.getElementById("ajajoon").src =
-        "https://query.wikidata.org/embed.html#" + encodeURIComponent(aeg);
-    </script>
-  </body>
+  <iframe
+    id="ajajoon"
+    title="Henry VIII ja tema esivanemate ajajoon">
+  </iframe>
+
+  <script>
+    let graaf = `#defaultView:Graph
+SELECT DISTINCT ?laps ?lapsLabel ?vanem ?vanemLabel WHERE {
+  {
+    ?laps (wdt:P22|wdt:P25)* wd:Q38370.
+    ?laps (wdt:P22|wdt:P25) ?vanem.
+  }
+  UNION
+  {
+    wd:Q38370 (wdt:P22|wdt:P25) ?laps.
+    ?laps (wdt:P22|wdt:P25) ?vanem.
+  }
+
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "et,en".
+  }
+}`;
+
+    let aeg = `#defaultView:Timeline
+SELECT DISTINCT ?isik ?isikLabel ?synd ?surm WHERE {
+  wd:Q38370 (wdt:P22|wdt:P25)?/(wdt:P22|wdt:P25)? ?isik.
+  ?isik wdt:P569 ?synd.
+  ?isik wdt:P570 ?surm.
+
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "et,en".
+  }
+}
+ORDER BY ?synd`;
+
+    // Muudame päringud veebiaadressi jaoks sobivaks.
+    let graafikood = encodeURIComponent(graaf.trim());
+    let ajakood = encodeURIComponent(aeg.trim());
+
+    // Kuvame joonised veebilehel.
+    document.getElementById("vorgustik").src =
+      "https://query.wikidata.org/embed.html#" + graafikood;
+
+    document.getElementById("ajajoon").src =
+      "https://query.wikidata.org/embed.html#" + ajakood;
+
+    // Lisame lingid päringute avamiseks Wikidatas.
+    document.getElementById("graafilink").href =
+      "https://query.wikidata.org/#" + graafikood;
+
+    document.getElementById("ajalink").href =
+      "https://query.wikidata.org/#" + ajakood;
+  </script>
+</body>
 </html>
