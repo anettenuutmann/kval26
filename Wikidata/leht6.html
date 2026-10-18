@@ -4,13 +4,60 @@
     <meta charset="utf-8">
     <title>Henry VIII perekond</title>
   </head>
+
   <body>
     <h1>Henry VIII perekond</h1>
 
     <h2>Perekonnavõrgustik</h2>
-    <!-- Siia võrgustiku iframe-kood -->
+    <p>Võrgustik näitab lapse ja vanema vahelisi seoseid.</p>
+    <iframe id="vorgustik" title="Perekonnavõrgustik"
+      width="100%" height="650" style="border:0"></iframe>
 
     <h2>Henry VIII ja tema esivanemate ajajoon</h2>
-    <!-- Siia ajajoone iframe-kood -->
+    <p>Ajajoon näitab Henry VIII, tema vanemate ja vanavanemate eluiga.</p>
+    <iframe id="ajajoon" title="Esivanemate ajajoon"
+      width="100%" height="550" style="border:0"></iframe>
+
+    <script>
+      let graaf = `
+        #defaultView:Graph
+        SELECT DISTINCT ?laps ?lapsLabel ?vanem ?vanemLabel WHERE {
+          {
+            ?laps (wdt:P22|wdt:P25)* wd:Q38370.
+            ?laps (wdt:P22|wdt:P25) ?vanem.
+          }
+          UNION
+          {
+            wd:Q38370 (wdt:P22|wdt:P25) ?laps.
+            ?laps (wdt:P22|wdt:P25) ?vanem.
+          }
+
+          SERVICE wikibase:label {
+            bd:serviceParam wikibase:language "et,en".
+          }
+        }
+      `;
+
+      let aeg = `
+        #defaultView:Timeline
+        SELECT ?isik ?isikLabel ?synd ?surm WHERE {
+          wd:Q38370 (wdt:P22|wdt:P25)?/(wdt:P22|wdt:P25)? ?isik.
+          ?isik wdt:P569 ?synd.
+          ?isik wdt:P570 ?surm.
+
+          SERVICE wikibase:label {
+            bd:serviceParam wikibase:language "et,en".
+          }
+        }
+        ORDER BY ?synd
+      `;
+
+      // Lisame päringud Wikidata manustamislinkidesse.
+      document.getElementById("vorgustik").src =
+        "https://query.wikidata.org/embed.html#" + encodeURIComponent(graaf);
+
+      document.getElementById("ajajoon").src =
+        "https://query.wikidata.org/embed.html#" + encodeURIComponent(aeg);
+    </script>
   </body>
 </html>
