@@ -225,18 +225,18 @@ SELECT DISTINCT ?isik ?isikLabel ?synd ?surm WHERE {
 }
 ORDER BY ?synd`;
 
-    // Muudame päringud veebiaadressi jaoks sobivaks.
+    //  päringud veebiaadressi jaoks sobivaks.
     let graafikood = encodeURIComponent(graaf.trim());
     let ajakood = encodeURIComponent(aeg.trim());
 
-    // Kuvame võrgustiku ja ajajoone.
+    // võrgustik ja ajajoon
     document.getElementById("vorgustik").src =
       "https://query.wikidata.org/embed.html#" + graafikood;
 
     document.getElementById("ajajoon").src =
       "https://query.wikidata.org/embed.html#" + ajakood;
 
-    // Lisame lingid Wikidatasse.
+    // Lingid Wikidatasse.
     document.getElementById("graafilink").href =
       "https://query.wikidata.org/#" + graafikood;
 
