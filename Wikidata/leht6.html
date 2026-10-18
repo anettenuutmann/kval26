@@ -27,8 +27,9 @@
 
   <h2>Perekonnavõrgustik</h2>
   <p>
-    Võrgustik näitab Henry VIII vanemaid, vanavanemaid
-    ja järglasi ning nende vanemaid.
+    Võrgustik näitab Henry VIII vanemaid ja vanavanemaid
+    ning lapsi ja lapselapsi koos nende vanematega,
+    kui vastavad seosed on Wikidatas olemas.
     Seosed on suunaga lapselt vanemale.
   </p>
 
@@ -60,7 +61,7 @@
     let graaf = `#defaultView:Graph
 SELECT DISTINCT ?laps ?lapsLabel ?vanem ?vanemLabel WHERE {
   {
-    ?laps (wdt:P22|wdt:P25)* wd:Q38370.
+    wd:Q38370 wdt:P40?/wdt:P40? ?laps.
     ?laps (wdt:P22|wdt:P25) ?vanem.
   }
   UNION
@@ -90,7 +91,7 @@ ORDER BY ?synd`;
     let graafikood = encodeURIComponent(graaf.trim());
     let ajakood = encodeURIComponent(aeg.trim());
 
-    // Kuvame joonised veebilehel.
+    // Kuvame võrgustiku ja ajajoone veebilehel.
     document.getElementById("vorgustik").src =
       "https://query.wikidata.org/embed.html#" + graafikood;
 
