@@ -59,19 +59,11 @@
 	    }
 	  }
 	  function uuendaAndmed(){
-		  fetch("https://script.google.com/macros/s/AKfycbyMmXqfhBvAT0ndrcPpmjfsZiLGoypJzWI2BJExl8blBgAf16tAoTNK1-QJ_fE1sHHo/exec").then(d => d.json()).then(loe);
+		  fetch("https://script.google.com/macros/s/AKfycbyMmXqfhBvAT0ndrcPpmjfsZiLGoypJzWI2BJExl8blBgAf16tAoTNK1-QJ_fE1sHHo/exec"
+			      ).then(d => d.json()).then(loe);
 	  }
 	  function loe(andmed){
-      ilmaandmed=andmed;
-		  console.log(tekst);
-		  ilmaandmed=[]
-		  for(rida of tekst.split("\n")){
-			  let m=rida.split(",")
-			  m[1]=parseInt(m[1]);
-			  m[2]=parseInt(m[2]);
-			  m[3]=parseInt(m[3]);
-			  ilmaandmed.push(m);
-		  }
+		  ilmaandmed=andmed;
 		  joonista();
 	  }
 	</script>
